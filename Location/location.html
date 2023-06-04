@@ -1,0 +1,114 @@
+<html>
+	<head>
+		<link rel="stylesheet" href="leaflet.css">
+		<title>locatoin</title>
+		<style>
+			body{
+				background-color:lightyellow;
+			}
+			#pointer{
+				float:left;
+				display:inline;
+				width:35px;
+				height:35px;
+				margin-right:5px;
+			}
+			h2{
+				color:brown;
+				text-decoration:underline;
+				font-family:Century;
+			}
+			#map{
+				height: 500px;
+			}
+			#form > label{
+				color:darkolivegreen;
+				font-family:Arial;	
+			}
+            #search {
+                background-color: darkcyan;
+                color: aliceblue;
+            }
+			#result > label{
+				color:coral;
+			}
+		</style>
+	</head>
+	<body>
+		<img id="pointer" src="pointer.png"/>
+		<h2>Lets find your location!</h2>
+		<div>
+			<div id="form">
+				<label>Enter Latitude </label>
+				<input type="number" id="lat"><br><br />
+				<label>Enter Longtitude </label>
+				<input type="number" id="lng"><br><br />
+				<input type="button" id="search" value="Search">
+			</div>
+			<br />
+			<div id="result">
+				<label>City:</label>
+				<label id="city"></label><br>
+				<label>Country:</label>
+				<label id="country"></label><br>
+				<label>Zip code:</label>
+				<label id="zip_code"></label><br>
+				<label>Address:</label>
+				<label id="address"></label><br>
+			</div>
+		</div>
+		
+		<br />
+		<div id="map"></div>
+	
+		<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+		<script src="leaflet.js"></script>
+		<script>
+		    var map = L.map('map').setView([51.505, -0.09], 13);
+
+			L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    			attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+			}).addTo(map);
+
+			$("#search").click(function (){
+				get_address_detail();
+			})
+		
+			function get_address_detail(){
+			
+				//41.319851, 19.798135
+				var lat = $("#lat").val();
+				var lng = $("#lng").val();
+				
+				var url_1 = "https://nominatim.openstreetmap.org/reverse?format=json&lat="+lat+"&lon="+lng+"&zoom=27&addressdetails=1"
+			
+				$.ajax({
+					url: url_1,
+					type: "GET", // Whether this is a POST or GET request
+					success: function (json) {
+						var address = json['address'];
+						var city = address['city'];
+						var country = address['country'];
+						var zip_code = address['postcode'];
+						var address_1 = address['road'];
+						
+						$('#').text(city);
+						$('#country').text(country);
+						$('#zip_code').text(zip_code);
+						$('#address').text(address_1);
+						
+						L.marker([lat, lng]).addTo(map)
+    					.bindPopup(city + " || " + country)
+    					.openPopup();
+			
+					},
+					error: function (xhr, status, errorThrown) {
+						alert("Sorry, there was a problem!");
+					},
+				});	
+			}
+	
+			
+		</script>
+	</body>
+</html>
